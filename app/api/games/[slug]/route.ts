@@ -1,10 +1,8 @@
-import { db } from "@/src/db";
+import { getGameBySlug } from "@/db/repo";
 import {
   GetGameDetailResponse,
-  GetGameListResponse,
-  mapGamesTableToGame,
   mapGamesTableToGameDetail,
-} from "@/src/services/games";
+} from "@/services/games";
 import { NextRequest } from "next/server";
 
 export async function GET(
@@ -12,14 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-
-  const game = await db.query.gamesTable.findFirst({
-    with: { categories: true },
-    where: {
-      slug: slug,
-    },
-  });
-
+  const game = await getGameBySlug(slug);
   if (game) {
     const response: GetGameDetailResponse = mapGamesTableToGameDetail(game);
     return Response.json(response);
