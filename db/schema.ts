@@ -29,3 +29,9 @@ export const gameCategoriesTable = sqliteTable("game_categories", {
   game_id: int().notNull(),
   category_id: int().notNull(),
 });
+
+export const gameFavoritesTable = sqliteTable("game_favorites", {
+  id: text().primaryKey(),
+  game_id: int().notNull(),
+  session_id: text().notNull(),
+});

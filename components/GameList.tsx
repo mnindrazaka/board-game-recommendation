@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "./ui/select";
 import Link from "next/link";
+import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/label";
 
 const playerNumberItems = [
   { label: "Any", value: null },
@@ -52,6 +54,7 @@ export type GameListProps = {
   defaultPlayerNumber: number | null;
   defaultMaxPlayTime: number | null;
   defaultComplexity: string | null;
+  defaultIsFavoriteOnly: boolean | null;
   defaultTotal: number;
 };
 
@@ -71,6 +74,9 @@ export function GameList(props: GameListProps) {
   const [complexity, setComplexity] = useState<string | null>(
     props.defaultComplexity,
   );
+  const [isFavoriteOnly, setIsFavoriteOnly] = useState<boolean | null>(
+    props.defaultIsFavoriteOnly,
+  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -82,7 +88,8 @@ export function GameList(props: GameListProps) {
         playerNumber !== props.defaultPlayerNumber ||
         maxPlayTime !== props.defaultMaxPlayTime ||
         complexity !== props.defaultComplexity ||
-        games !== props.defaultGames
+        games !== props.defaultGames ||
+        isFavoriteOnly !== props.defaultIsFavoriteOnly
       ) {
         setLoading(true);
         setError(false);
@@ -92,6 +99,7 @@ export function GameList(props: GameListProps) {
             playerNumber,
             maxPlayTime,
             complexity,
+            isFavoriteOnly,
           });
           setGames(response.games);
           setTotal(response.total);
@@ -103,7 +111,7 @@ export function GameList(props: GameListProps) {
         }
       }
     })();
-  }, [query, playerNumber, maxPlayTime, complexity]);
+  }, [query, playerNumber, maxPlayTime, complexity, isFavoriteOnly]);
 
   useEffect(() => {
     const url = new URL(window.location.origin + window.location.pathname);
@@ -124,8 +132,12 @@ export function GameList(props: GameListProps) {
       url.searchParams.set("complexity", complexity);
     }
 
+    if (isFavoriteOnly !== null) {
+      url.searchParams.set("is_favorite_only", String(isFavoriteOnly));
+    }
+
     window.history.replaceState({}, "", url);
-  }, [query, playerNumber, maxPlayTime, complexity]);
+  }, [query, playerNumber, maxPlayTime, complexity, isFavoriteOnly]);
 
   function onSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
     const newText = event.target.value;
@@ -154,6 +166,7 @@ export function GameList(props: GameListProps) {
           playerNumber,
           maxPlayTime,
           complexity,
+          isFavoriteOnly,
         });
         setGames(response.games);
         setTotal(response.total);
@@ -163,6 +176,10 @@ export function GameList(props: GameListProps) {
         setLoading(false);
       }
     })();
+  }
+
+  function onIsFavoriteOnlyChange(checked: boolean) {
+    setIsFavoriteOnly(checked);
   }
 
   return (
@@ -241,6 +258,17 @@ export function GameList(props: GameListProps) {
                 </SelectContent>
               </Select>
             </Field>
+
+            <Field orientation="horizontal">
+              <Checkbox
+                id="favorite-checkbox"
+                onCheckedChange={onIsFavoriteOnlyChange}
+                checked={isFavoriteOnly ?? false}
+              />
+              <Label htmlFor="favorite-checkbox">
+                Show only favorite games
+              </Label>
+            </Field>
           </div>
         </CardHeader>
       </Card>
@@ -280,12 +308,15 @@ export function GameList(props: GameListProps) {
                     <GameCard
                       title={game.title}
                       subtitle={game.subtitle}
+                      slug={game.slug}
                       complexity={game.complexity}
                       minPlayer={game.minPlayer}
                       maxPlayer={game.maxPlayer}
                       minPlayTime={game.minPlayTime}
                       maxPlayTime={game.maxPlayTime}
                       imageUrl={game.imageUrl}
+                      isFavorite={game.isFavorite}
+                      onFavoriteChange={onRetryClick}
                     />
                   </Link>
                 </div>

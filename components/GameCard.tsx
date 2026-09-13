@@ -1,15 +1,19 @@
 import { ComplexityBadge } from "./ComplexityBadge";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { GameFavoriteButton } from "./GameFavoriteButton";
 
 export type GameCardProps = {
   title: string;
   subtitle: string;
+  slug: string;
   imageUrl: string;
   complexity: "light" | "medium" | "heavy";
   minPlayer: number;
   maxPlayer: number;
   minPlayTime: number;
   maxPlayTime: number;
+  isFavorite: boolean;
+  onFavoriteChange?: () => void;
 };
 
 export function GameCard(props: GameCardProps) {
@@ -22,7 +26,14 @@ export function GameCard(props: GameCardProps) {
         className="relative z-20 aspect-video w-full object-cover"
       />
       <CardHeader className="flex flex-col justify-between gap-3 flex-1">
-        <CardTitle>{props.title}</CardTitle>
+        <CardTitle className="flex justify-between items-center w-full">
+          <p>{props.title}</p>
+          <GameFavoriteButton
+            defaultIsFavorite={props.isFavorite}
+            slug={props.slug}
+            onFavoriteChange={props.onFavoriteChange}
+          />
+        </CardTitle>
         <CardDescription>{props.subtitle}</CardDescription>
         <div className="flex gap-3">
           <ComplexityBadge complexity={props.complexity} />

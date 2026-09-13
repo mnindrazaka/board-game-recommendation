@@ -14,4 +14,10 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.gamesTable.id.through(r.gameCategoriesTable.game_id),
     }),
   },
+  // gameFavoritesTable: {
+  //   game: r.gamesTable({
+  //     from: r.gameFavoritesTable.game_id.through(r.gamesTable.id),
+  //     to: r.gamesTable.id.through(r.gameFavoritesTable.game_id),
+  //   }),
+  // },
 }));

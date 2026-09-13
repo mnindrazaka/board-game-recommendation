@@ -1,4 +1,5 @@
 import { ComplexityBadge } from "@/components/ComplexityBadge";
+import { GameFavoriteButton } from "@/components/GameFavoriteButton";
 import { Badge } from "@/components/ui/badge";
 import { fetchGameBySlug } from "@/services/games";
 import Link from "next/link";
@@ -15,7 +16,13 @@ export default async function GameDetailPage(props: GameDetailPageProps) {
       <Link href="/">Back to games</Link>
 
       <img src={game.imageUrl} alt={game.title} />
-      <h1>{game.title}</h1>
+      <div className="flex justify-between items-center">
+        <h1>{game.title}</h1>
+        <GameFavoriteButton
+          defaultIsFavorite={game.isFavorite}
+          slug={game.slug}
+        />
+      </div>
       <p>{game.subtitle}</p>
 
       <div>

@@ -1,5 +1,6 @@
 import { GameList } from "@/components/GameList";
 import { fetchGames } from "@/services/games";
+import { cookies } from "next/headers";
 
 export type HomePageProps = {
   searchParams: Promise<{
@@ -7,11 +8,13 @@ export type HomePageProps = {
     player_number?: string;
     max_play_time?: string;
     complexity?: string;
+    is_favorite_only?: string;
   }>;
 };
 
 export default async function Home(props: HomePageProps) {
   const searchParams = await props.searchParams;
+  const cookieStore = await cookies();
   const fetchGamesResponse = await fetchGames({
     query: searchParams.query ?? null,
     playerNumber: searchParams.player_number
@@ -21,6 +24,13 @@ export default async function Home(props: HomePageProps) {
     maxPlayTime: searchParams.max_play_time
       ? Number(searchParams.max_play_time)
       : null,
+    isFavoriteOnly:
+      searchParams.is_favorite_only === undefined
+        ? null
+        : searchParams.is_favorite_only === "true"
+          ? true
+          : false,
+    cookies: cookieStore.toString(),
   });
   return (
     <div className="flex flex-col gap-8 items-center bg-zinc-50 font-sans dark:bg-black pt-8">
@@ -48,6 +58,13 @@ export default async function Home(props: HomePageProps) {
               : null
           }
           defaultComplexity={searchParams.complexity ?? null}
+          defaultIsFavoriteOnly={
+            searchParams.is_favorite_only === undefined
+              ? null
+              : searchParams.is_favorite_only === "true"
+                ? true
+                : false
+          }
         />
       </div>
     </div>

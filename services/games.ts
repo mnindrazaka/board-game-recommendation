@@ -30,11 +30,15 @@ export async function fetchGames({
   playerNumber,
   maxPlayTime,
   complexity,
+  isFavoriteOnly,
+  cookies,
 }: {
   query: string | null;
   playerNumber: number | null;
   maxPlayTime: number | null;
   complexity: string | null;
+  isFavoriteOnly: boolean | null;
+  cookies?: string;
 }): Promise<GetGameListResponse> {
   const url = new URL(`http://localhost:3000/api/games`);
 
@@ -54,15 +58,37 @@ export async function fetchGames({
     url.searchParams.set("complexity", complexity);
   }
 
-  const res = await fetch(url);
+  if (isFavoriteOnly) {
+    url.searchParams.set("is_favorite_only", String(isFavoriteOnly));
+  }
+
+  const res = await fetch(
+    url,
+    cookies
+      ? {
+          headers: {
+            Cookie: cookies,
+          },
+        }
+      : undefined,
+  );
   return res.json();
 }
 
 export async function fetchGameBySlug(
   slug: string,
 ): Promise<GetGameDetailResponse> {
-  const response = await fetch("http://localhost:3000/api/games/" + slug);
+  const response = await fetch("http://localhost:3000/api/games/" + slug, {
+    credentials: "include",
+  });
   return response.json();
+}
+
+export async function toggleGameFavorite(slug: string) {
+  await fetch(`http://localhost:3000/api/games/${slug}/toggle-favorite`, {
+    method: "PATCH",
+  });
+  return true;
 }
 
 export function mapGamesTableToGame(gameTable: GamesTable): Game {
